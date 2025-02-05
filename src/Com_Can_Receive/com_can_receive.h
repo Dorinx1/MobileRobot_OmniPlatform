@@ -39,15 +39,15 @@
 
 /*Select one of configuration for L298_id_driver to control dc motor */
 
-#define CURRENT_L298_ID L298_ID_0
+// #define CURRENT_L298_ID L298_ID_0
 // #define CURRENT_L298_ID L298_ID_1 
-// #define CURRENT_L298_ID L298_ID_2 
+#define CURRENT_L298_ID L298_ID_2 
 // #define CURRENT_L298_ID L298_ID_3 
 
 /*Select one of configuration for Servo */
-#define CURRENT_SERVO_ID SERVO_ID_0
+// #define CURRENT_SERVO_ID SERVO_ID_0
 // #define CURRENT_SERVO_ID SERVO_ID_1
-// #define CURRENT_SERVO_ID SERVO_ID_2
+#define CURRENT_SERVO_ID SERVO_ID_2
 // #define CURRENT_SERVO_ID SERVO_ID_3
 
 extern long unsigned int rxId;

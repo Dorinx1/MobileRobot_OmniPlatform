@@ -90,7 +90,11 @@ void com_can_recv_loop()
       Serial.print("\t");
       Serial.print(CURRENT_SERVO_ID,HEX);
       Speed = rxBuf[4];
+      Serial.print("\tSpeed ");
+      Serial.print(Speed);
       Dir = rxBuf[5];
+      Serial.print("\t Dir ");
+      Serial.print(Dir);
       ctrl_traction_move(Speed, Dir);
     }
 

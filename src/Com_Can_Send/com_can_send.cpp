@@ -4,7 +4,7 @@
 MCP_CAN CAN0_SEND(10);  // Set CS la pin 10
 
 // byte MSG_TX[8][7];  // Redefinim MSG_TX ca un array 8x3 pentru a asigura dimensiunea corectă a mesajului
-byte MessageBuff_F_DC[8] =  {200,1,200,1,200,1,200,1};
+byte MessageBuff_F_DC[8] =  {100,1,100,1,100,1,100,1};
 byte MessageBuff_L_SRV[8] = {1,150,1,150,1,150,1,150};
 byte MessageBuff_B_DC[8] =  {200,0,200,0,200,0,200,0};
 byte MessageBuff_R_SRV[8] = {0,150,0,150,0,150,0,150};
