@@ -1,6 +1,51 @@
 #include "Arduino.h"
 #include "ed_l298L/ed_l298.h"
 
+
+void ed_l298_setup()
+{
+
+    pinMode(ED_L298_PIN_IN1, OUTPUT);
+    pinMode(ED_L298_PIN_IN2, OUTPUT);
+    pinMode(ED_L298_PIN_ENA, OUTPUT);
+
+    digitalWrite(ED_L298_PIN_IN1, LOW);
+    digitalWrite(ED_L298_PIN_IN2, LOW);
+    analogWrite( ED_L298_PIN_ENA, LOW);
+  
+}
+
+void ed_l298_loop()
+{
+  
+}
+
+void ed_l298_set(uint8_t in1_state,uint8_t in2_state, uint8_t ena_state)
+{
+   if ((in1_state == 1) && (in2_state == 0))
+   {
+     digitalWrite(ED_L298_PIN_IN1, HIGH);
+     digitalWrite(ED_L298_PIN_IN2, LOW);
+     analogWrite (ED_L298_PIN_ENA, ena_state);
+   }
+   else if ((in1_state == 0) && (in2_state == 1))
+   {
+     digitalWrite(ED_L298_PIN_IN1, LOW);
+     digitalWrite(ED_L298_PIN_IN2, HIGH);
+     analogWrite( ED_L298_PIN_ENA, ena_state);
+   }
+   else 
+   {
+     digitalWrite(ED_L298_PIN_IN1, LOW);
+     digitalWrite(ED_L298_PIN_IN2, LOW);
+     analogWrite( ED_L298_PIN_ENA, 0);
+   }
+   
+}
+/*
+#include "Arduino.h"
+#include "ed_l298L/ed_l298.h"
+
 uint8_t ed_l298_pin_in1[ED_L298_NR_OF] = ED_L298_PIN_IN1;
 uint8_t ed_l298_pin_in2[ED_L298_NR_OF] = ED_L298_PIN_IN2;
 uint8_t ed_l298_pin_ena[ED_L298_NR_OF] = ED_L298_PIN_ENA;
@@ -50,3 +95,4 @@ void ed_l298_set(uint8_t id_driver,uint8_t in1_state,uint8_t in2_state, uint8_t 
    
 }
 
+*/

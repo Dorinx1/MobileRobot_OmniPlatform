@@ -5,8 +5,8 @@
 #define SLAVE  2
 
 /*--------Chose configuration--------*/
-// #define ECU_CONFIG MASTER
-#define ECU_CONFIG SLAVE
+#define ECU_CONFIG MASTER
+// #define ECU_CONFIG SLAVE
 
 #if ECU_CONFIG == MASTER
 #include "Com_Can_Send/com_can_send.h"

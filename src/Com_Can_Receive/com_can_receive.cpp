@@ -13,8 +13,8 @@ bool Dir;
 bool Angle;
 uint8_t Power;
 
-#define current_l298_id 0x00
-#define current_servo_id
+#define message_l298_id 0x00
+#define message_servo_id 0x10
 
 MCP_CAN CAN0_RECV(10);  // Set CS to pin 10
 
@@ -32,23 +32,6 @@ void com_can_recv_setup()
   pinMode(CAN0_INT, INPUT);  // Configuring pin for /INT input
   
   Serial.println("MCP slave mode on.........");
-
-  // #if CURRENT_L298_ID == L298_ID_0 
-  // current_l298_id = 0x00;
-  // #elif CURRENT_L298_ID == L298_ID_1 
-  // current_l298_id = 0x00; 
-  // #elif CURRENT_L298_ID == L298_ID_2 
-  // current_l298_id = 0x00;
-  // #elif CURRENT_L298_ID == L298_ID_3 
-  // current_l298_id = 0x00;
-  // #endif 
-
-  // #ifdef CURRENT_L298_ID
-  //     #define current_l298_id 0x00
-  // #elif defined(CURRENT_SERVO_ID)
-  //     #define current_servo_id 0x00
-  // #endif
-
 }
 
 
@@ -59,52 +42,48 @@ void com_can_recv_loop()
   CAN0_RECV.readMsgBuf(&rxId, &len, rxBuf);  // Read data: len = data length, buf = data byte(s)
 
     #if CURRENT_L298_ID == 0x00
-      if (current_l298_id == rxId)
+      if (message_l298_id == rxId)
       {
         Serial.print("\n PCB with ID : ");
-        Serial.print(CURRENT_L298_ID, HEX);
+        Serial.print(message_l298_id, HEX);
         Serial.print("\t");
-        Serial.print(CURRENT_SERVO_ID,HEX);
+        Serial.print(message_servo_id,HEX);
         Speed = rxBuf[0];
         Dir = rxBuf[1];
         ctrl_traction_move(Speed, Dir);
       }
   
     #elif CURRENT_L298_ID  == 0x10
-    if(current_l298_id == rxId )
+    if(message_l298_id == rxId )
     {
       Serial.print("\n PCB with ID : ");
-      Serial.print(CURRENT_L298_ID, HEX);
+      Serial.print(message_l298_id, HEX);
       Serial.print("\t");
-      Serial.print(CURRENT_SERVO_ID,HEX);
+      Serial.print(message_servo_id,HEX);
       Speed = rxBuf[2];
       Dir = rxBuf[3];
       ctrl_traction_move(Speed, Dir);
     }
 
     #elif CURRENT_L298_ID == 0x20
-    if(current_l298_id == rxId)
+    if(message_l298_id == rxId)
     {
       Serial.print("\n PCB with ID : ");
-      Serial.print(CURRENT_L298_ID, HEX);
+      Serial.print(message_l298_id, HEX);
       Serial.print("\t");
-      Serial.print(CURRENT_SERVO_ID,HEX);
+      Serial.print(message_servo_id,HEX);
       Speed = rxBuf[4];
-      Serial.print("\tSpeed ");
-      Serial.print(Speed);
       Dir = rxBuf[5];
-      Serial.print("\t Dir ");
-      Serial.print(Dir);
       ctrl_traction_move(Speed, Dir);
     }
 
     #elif CURRENT_L298_ID == 0x30
-    if(current_l298_id == rxId)
+    if(message_l298_id == rxId)
     {
       Serial.print("\n PCB with ID : ");
-      Serial.print(CURRENT_L298_ID, HEX);
+      Serial.print(message_l298_id, HEX);
       Serial.print("\t");
-      Serial.print(CURRENT_SERVO_ID,HEX);
+      Serial.print(message_servo_id,HEX);
       Speed = rxBuf[6]; 
       Dir = rxBuf[7];
       ctrl_traction_move(Speed, Dir);

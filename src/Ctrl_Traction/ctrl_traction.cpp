@@ -18,10 +18,10 @@ void ctrl_traction_move(const uint8_t speed, const bool direction)
 {
     if (direction == true) 
     {
-        ed_l298_set(0x00, 1, 0, speed);
+        ed_l298_set(1, 0, speed);
     }
     else 
     {
-        ed_l298_set(0x00, 0, 1, speed);
+        ed_l298_set(0, 1, speed);
     }
 }

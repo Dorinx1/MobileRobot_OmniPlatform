@@ -4,10 +4,10 @@
 MCP_CAN CAN0_SEND(10);  // Set CS la pin 10
 
 // byte MSG_TX[8][7];  // Redefinim MSG_TX ca un array 8x3 pentru a asigura dimensiunea corectă a mesajului
-byte MessageBuff_F_DC[8] =  {100,1,100,1,100,1,100,1};
-byte MessageBuff_L_SRV[8] = {1,150,1,150,1,150,1,150};
-byte MessageBuff_B_DC[8] =  {200,0,200,0,200,0,200,0};
-byte MessageBuff_R_SRV[8] = {0,150,0,150,0,150,0,150};
+byte MessageBuff_F_DC[8] =  {150,1,150,1,150,1,150,1};
+byte MessageBuff_L_SRV[8] = {1,100,1,100,1,100,1,100};
+byte MessageBuff_B_DC[8] =  {150,0,150,0,150,0,150,0};
+byte MessageBuff_R_SRV[8] = {0,100,0,100,0,100,0,100};
 byte MessageBuff_S_DC_SRV[8] = {0,0,0,0,0,0,0,0};
 
 
@@ -44,7 +44,7 @@ void com_can_send_loop() {
         }
 
         if (CAN0_SEND.sendMsgBuf(MESSAGE_ID, 0, 8, selectedMessage) == CAN_OK) {
-            Serial.print("ID: ");
+            Serial.print("MSG_ID: ");
             Serial.print(MESSAGE_ID, HEX);
             Serial.print("\t Comanda '");
             Serial.print(cmd);
