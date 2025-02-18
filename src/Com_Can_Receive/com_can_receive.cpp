@@ -3,313 +3,112 @@
 long unsigned int rxId;
 unsigned char len = 0;
 unsigned char rxBuf[8];
-char msgString[128];  
+char msgString[128];
 
-/*l298 driver var*/
+/* L298 driver variables */
 uint8_t Speed;
 bool Dir;
 
-/*Servo driver var */
+/* Servo driver variables */
 bool Dir_servo;
 uint8_t Power_Servo;
 
-#define message_l298_id 0x00
-#define message_servo_id 0x00
+/* Define message IDs */
+#define MESSAGE_L298_ID 0x00   // L298 message ID (constant)
+#define MESSAGE_SERVO_ID 0x10  // Servo message ID (constant)
 
 MCP_CAN CAN0_RECV(10);  // Set CS to pin 10
 
-
-void com_can_recv_setup()
-{
-  // Initialize MCP2515 running at 16MHz with a baudrate of 500kb/s and the masks and filters disabled.
-  if (CAN0_RECV.begin(MCP_ANY, CAN_500KBPS, MCP_16MHZ) == CAN_OK)
-    Serial.println("MCP2515 Initialized Successfully!");
-  else
-    Serial.println("Error Initializing MCP2515...");
-    
-  CAN0_RECV.setMode(MCP_NORMAL);  // Set operation mode to normal so the MCP2515 sends acks to received data.
-
-  pinMode(CAN0_INT, INPUT);  // Configuring pin for /INT input
-  
-  Serial.println("MCP slave mode on.........");
-}
-
-
-void com_can_recv_loop()
-{
-  if (!digitalRead(CAN0_INT))  // If CAN0_INT pin is low, read receive buffer
-  {
-  CAN0_RECV.readMsgBuf(&rxId, &len, rxBuf);  // Read data: len = data length, buf = data byte(s)
-
-    /*--------------------Traction part-----------------------*/  
-    #if CURRENT_L298_ID == 0x00
-      if (message_l298_id == rxId)
-      {
-        Serial.print("\n MESSAGE_ID : ");
-        Serial.print(message_l298_id, HEX);
-        Serial.print("\t");
-        Serial.print(message_servo_id,HEX);
-        Speed = rxBuf[0];
-        Dir = rxBuf[1];
-        ctrl_traction_move(Speed, Dir);
-      }
-  
-    #elif CURRENT_L298_ID  == 0x10
-    if(message_l298_id == rxId )
-    {
-      Serial.print("\n MESSAGE_ID : ");
-      Serial.print(message_l298_id, HEX);
-      Serial.print("\t");
-      Serial.print(message_servo_id,HEX);
-      Speed = rxBuf[2];
-      Dir = rxBuf[3];
-      ctrl_traction_move(Speed, Dir);
-    }
-
-    #elif CURRENT_L298_ID == 0x20
-    if(message_l298_id == rxId)
-    {
-      Serial.print("\n MESSAGE_ID : ");
-      Serial.print(message_l298_id, HEX);
-      Serial.print("\t");
-      Serial.print(message_servo_id,HEX);
-      Speed = rxBuf[4];
-      Dir = rxBuf[5];
-      ctrl_traction_move(Speed, Dir);
-    }
-    else
-    {
-      Serial.println("l298_id 0x20 fail command");
-    } 
-
-    #elif CURRENT_L298_ID == 0x30
-    if(message_l298_id == rxId)
-    {
-      Serial.print("\n MESSAGE_ID : ");
-      Serial.print(message_l298_id, HEX);
-      Serial.print("\t");
-      Serial.print(message_servo_id,HEX);
-      Speed = rxBuf[6]; 
-      Dir = rxBuf[7];
-      ctrl_traction_move(Speed, Dir);
-    }
-    #endif
-    
-    
-    /*---------------Steering Part -----------------------------*/
-    #if CURRENT_SERVO_ID == 0x01
-    if(message_servo_id == rxId)
-    {
-      Serial.print("\n MESSAGE_ID : ");
-      Serial.print(message_servo_id, HEX);
-      Serial.print("\t");
-      Serial.print(message_servo_id,HEX);
-      Dir_servo = rxBuf[0];
-      Power_Servo = rxBuf[1];
-      ctrl_steering_set_Angle(Dir_servo,Power_Servo);
-    }
-    #elif CURRENT_SERVO_ID == 0x11
-    if(message_servo_id == rxId)
-    {
-      Serial.print("\n MESSAGE_ID : ");
-      Serial.print(message_servo_id, HEX);
-      Serial.print("\t");
-      Serial.print(message_servo_id,HEX);
-      Dir_servo = rxBuf[2];
-      Power_Servo = rxBuf[3];
-      ctrl_steering_set_Angle(Dir_servo,Power_Servo);
-    }
-    #elif CURRENT_SERVO_ID == 0x21
-    if(message_servo_id == rxId)
-    {
-      Serial.print("\n MESSAGE_ID : ");
-      Serial.print(message_servo_id, HEX);
-      Serial.print("\t");
-      Serial.print(message_servo_id,HEX);
-      Dir_servo = rxBuf[4];
-      Power_Servo = rxBuf[5];
-      ctrl_steering_set_Angle(Dir_servo,Power_Servo);
-    }
-    else 
-    {
-      Serial.println("Servo 0x21 fail comand");
-    }
-    #elif CURRENT_SERVO_ID == 0x31
-    if(message_servo_id == rxId)
-    {
-      Serial.print("\n MESSAGE_ID : ");
-      Serial.print(message_servo_id, HEX);
-      Serial.print("\t");
-      Serial.print(message_servo_id,HEX);
-      Dir_servo = rxBuf[6];
-      Power_Servo = rxBuf[7];
-      ctrl_steering_set_Angle(Dir_servo,Power_Servo);
-    }
-    #endif
-    
-    Serial.print("\t\t RX_Message : ");
-    for (byte i = 0; i < len; i++) 
-    {
-    sprintf(msgString, " 0x%.2X", rxBuf[i]);
-    Serial.print(msgString);
-    }
-  
-  }
-}
-
-//=========================== versiune a loopului,nu lucreaza bine========
-
-
-
-
-//=======================================Rabociii Variant==============================
-
-// if(ID == ID_0 && ID == rxId)
-  // {
-  //   Serial.print("\nECU_OMNI_WHEEL_BL L298 with ID_0 : ");
-  //   Serial.print(rxId,HEX);
-  //   Speed = rxBuf[0];
-  //   Dir = rxBuf[1];
-  //   ctrl_traction_move(ID,Speed, Dir);
-  // }
-  // else if(ID == ID_1 && ID == rxId)    
-  // {
-  //   Serial.print("\nECU_OMNI_WHEEL_FL L298 with ID_1 : ");
-  //   Serial.print(rxId,HEX);
-  //   Speed = rxBuf[2];
-  //   Dir = rxBuf[3];
-  //   ctrl_traction_move(Speed, Dir);
-  // }
-  // else if(ID == ID_2 && ID == rxId)
-  // {
-  //   Serial.print("\nECU_OMNI_WHEEL_FR L298 with ID_2 : ");
-  //   Serial.print(rxId,HEX);
-  //   Speed = rxBuf[4];
-  //   Dir = rxBuf[5];
-  //   ctrl_traction_move(Speed, Dir);
-  // }
-  // else 
-  // {
-  //   Serial.print("\nECU_OMNI_WHEEL_BR L298 with ID_3 : ");
-  //   Serial.print(rxId,HEX);
-  //   Speed = rxBuf[6];
-  //   Dir = rxBuf[7];
-  //   ctrl_traction_move(Speed, Dir);
-  // }
-
-  // Serial.print("\t\t RX_Message : ");
-  // for (byte i = 0; i < len; i++) 
-  // {
-  // sprintf(msgString, " 0x%.2X", rxBuf[i]);
-  // Serial.print(msgString);
-  // }
-  
-
-/*
-  if(rxId == ECU_ARM_ID_LIST[])
-  {
-    Serial.print("ARM with ID : ");
-    Serial.print(rxId,HEX);
-    Serial.print("\t\t RX_Message : ");
-
-    for (byte i = 0; i < len; i++) 
-    {
-    sprintf(msgString, " 0x%.2X", rxBuf[i]);
-    Serial.print(msgString);
-    }
-
-    Serial.println();
-
-      if(ECU_ARM_ID_LIST[i] == 0)
-      {
-        Speed = digitalRead(rxBuf[0]);
-        Dir = digitalRead(rxBuf[1]);
-        ctrl_traction_move(Speed, Dir);
-      }
-      else if(ECU_ARM_ID_LIST[i] == 1)
-      {
-        Speed = digitalRead(rxBuf[2]);
-        Dir = digitalRead(rxBuf[3]);
-        ctrl_traction_move(Speed, Dir);
-      }
-      else if(ECU_ARM_ID_LIST[i] == 2)
-      {
-        Speed = digitalRead(rxBuf[4]);
-        Dir = digitalRead(rxBuf[5]);
-        ctrl_traction_move(Speed, Dir);
-      }
-      else 
-      {
-        Speed = digitalRead(rxBuf[6]);
-        Dir = digitalRead(rxBuf[7]);
-        ctrl_traction_move(Speed, Dir);
-      }
-  }
-
-*/
-
-  /*
-    for(uint16_t i = 0; i<ECU_OMNI_WHEEL_ALL;i++)
-    {
-      if(rxId == ECU_ARM_ID_LIST[i])
-      {
-        Serial.print("ARM with ID :");
-        Serial.println(rxId,HEX);
-
-        for (byte i = 0; i < len; i++) 
-        {
-          sprintf(msgString, " 0x%.2X", rxBuf[i]);
-          Serial.print(msgString);
-          
-          ctrl_traction_move(rxBuf[0], rxBuf[1]);
-        }
-        Serial.println("\n Traction Motor is active -> moving forward");
-      }
-      else if(rxId == ECU_ARM_ID_LIST[i])
-      {
-        Serial.print("ARM with ID :");
-        Serial.println(rxId,HEX);
-
-        for (byte i = 0; i < len; i++) 
-        {
-          sprintf(msgString, " 0x%.2X", rxBuf[i]);
-          Serial.print(msgString);
-
-        }
-        Serial.println("\n Traction Motor is active -> moving backward");
-      }
-      else if(rxId == ECU_ARM_ID_LIST[i])
-      {
-        Serial.print("ARM with ID :");
-        Serial.println(rxId,HEX);
-
-        for (byte i = 0; i < len; i++) 
-        {
-          sprintf(msgString, " 0x%.2X", rxBuf[i]);
-          Serial.print(msgString);
-        
-        }
-        Serial.println("\n Traction Motor is active -> Stop Motor");
-      }
-    }
-
-    */
-
-//=====================================================================================
-    /*if ((rxId & 0x80000000) == 0x80000000)  // Determine if ID is standard (11 bits) or extended (29 bits)
-      sprintf(msgString, "Extended ID: 0x%.8lX  DLC: %1d  Data:", (rxId & 0x1FFFFFFF), len);
-    else
-      sprintf(msgString, "Standard ID: 0x%.3lX       DLC: %1d  Data:", rxId, len);
-  
-    Serial.print(msgString);
-  
-    if ((rxId & 0x40000000) == 0x40000000) {  // Determine if message is a remote request frame.
-      sprintf(msgString, " REMOTE REQUEST FRAME");
-      Serial.print(msgString);
+void com_can_recv_setup() {
+    if (CAN0_RECV.begin(MCP_ANY, CAN_500KBPS, MCP_16MHZ) == CAN_OK) {
+        Serial.println("MCP2515 Initialized Successfully!");
     } else {
-      for (byte i = 0; i < len; i++) {
-        sprintf(msgString, " 0x%.2X", rxBuf[i]);
-        Serial.print(msgString);
-      }
+        Serial.println("Error Initializing MCP2515...");
     }
-    */    
+
+    CAN0_RECV.setMode(MCP_NORMAL);  // Set operation mode to normal
+    pinMode(CAN0_INT, INPUT);  // Configuring pin for /INT input
+    Serial.println("MCP slave mode on.........");
+}
+
+void com_can_recv_loop() {
+    if (!digitalRead(CAN0_INT)) {
+        CAN0_RECV.readMsgBuf(&rxId, &len, rxBuf);
+
+        Serial.print("\nMESSAGE_ID: 0x");
+        Serial.print(rxId, HEX);
+
+        /* -------------------- Traction Processing -------------------- */
+        if (rxId == MESSAGE_L298_ID) {
+            switch (CURRENT_L298_ID) {
+                case L298_ID_0:
+                    Speed = rxBuf[0];
+                    Dir = rxBuf[1];
+                    break;
+                case L298_ID_1:
+                    Speed = rxBuf[2];
+                    Dir = rxBuf[3];
+                    break;
+                case L298_ID_2:
+                    Speed = rxBuf[4];
+                    Dir = rxBuf[5];
+                    break;
+                case L298_ID_3:
+                    Speed = rxBuf[6];
+                    Dir = rxBuf[7];
+                    break;
+                default:
+                    Serial.println("Error: Invalid L298_ID");
+                    return;
+            }
+            Serial.print(" | Speed: ");
+            Serial.print(Speed);
+            Serial.print(" | Dir: ");
+            Serial.println(Dir);
+            ctrl_traction_move(Speed, Dir);
+        }
+
+        /* -------------------- Steering Processing -------------------- */
+        else if (rxId == MESSAGE_SERVO_ID) {
+            switch (CURRENT_SERVO_ID) {
+                case SERVO_ID_0:
+                    Dir_servo = rxBuf[0];
+                    Power_Servo = rxBuf[1];
+                    break;
+                case SERVO_ID_1:
+                    Dir_servo = rxBuf[2];
+                    Power_Servo = rxBuf[3];
+                    break;
+                case SERVO_ID_2:
+                    Dir_servo = rxBuf[4];
+                    Power_Servo = rxBuf[5];
+                    break;
+                case SERVO_ID_3:
+                    Dir_servo = rxBuf[6];
+                    Power_Servo = rxBuf[7];
+                    break;
+                default:
+                    Serial.println("Error: Invalid SERVO_ID");
+                    return;
+            }
+            Serial.print(" | Dir_Servo: ");
+            Serial.print(Dir_servo);
+            Serial.print(" | Power_Servo: ");
+            Serial.println(Power_Servo);
+            ctrl_steering_set_Angle(Dir_servo, Power_Servo);
+        } 
+        
+        /* Unknown Message */
+        else {
+            Serial.println(" | Unknown CAN message received!");
+        }
+
+        /* Print Received Data */
+        Serial.print("\t RX_Message: ");
+        for (byte i = 0; i < len; i++) {
+            sprintf(msgString, " 0x%.2X", rxBuf[i]);
+            Serial.print(msgString);
+        }
+        Serial.println();
+    }
+}

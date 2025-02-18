@@ -37,26 +37,35 @@
 #define L298_ID_3  WHEEL_DC_BR
 #define SERVO_ID_3 WHEEL_SERVO_BR
 
-/*Select one of configuration for L298_id_driver to control dc motor */
+/* Selectarea configurației motorului DC */
+// #define CURRENT_L298_ID L298_ID_0  // Schimbă aici PCB-ul dorit
+#define CURRENT_L298_ID L298_ID_1  // Schimbă aici PCB-ul dorit
+// #define CURRENT_L298_ID L298_ID_2  // Schimbă aici PCB-ul dorit
+// #define CURRENT_L298_ID L298_ID_3  // Schimbă aici PCB-ul dorit
 
-// #define CURRENT_L298_ID L298_ID_0
-// #define CURRENT_L298_ID L298_ID_1 
-#define CURRENT_L298_ID L298_ID_2 
-// #define CURRENT_L298_ID L298_ID_3 
-
-/*Select one of configuration for Servo */
-// #define CURRENT_SERVO_ID SERVO_ID_0
-// #define CURRENT_SERVO_ID SERVO_ID_1
-#define CURRENT_SERVO_ID SERVO_ID_2
-// #define CURRENT_SERVO_ID SERVO_ID_3
+/* Atribuire automată a servo-ului pe baza motorului selectat */
+#ifdef CURRENT_L298_ID
+    #if CURRENT_L298_ID == L298_ID_0
+        #define CURRENT_SERVO_ID SERVO_ID_0
+    #elif CURRENT_L298_ID == L298_ID_1
+        #define CURRENT_SERVO_ID SERVO_ID_1
+    #elif CURRENT_L298_ID == L298_ID_2
+        #define CURRENT_SERVO_ID SERVO_ID_2
+    #elif CURRENT_L298_ID == L298_ID_3
+        #define CURRENT_SERVO_ID SERVO_ID_3
+    #else
+        #error "CURRENT_L298_ID nu este valid!"
+    #endif
+#else
+    #error "CURRENT_L298_ID nu a fost definit!"
+#endif
 
 extern long unsigned int rxId;
 extern unsigned char len;
 extern unsigned char rxBuf[8];
 extern char msgString[128];  // Array to store serial string
 
-#define CAN0_INT 8  // Set INT to pin 2
-
+#define CAN0_INT 8  // Set INT to pin 8
 
 // Funcții pentru setare și buclă principală
 void com_can_recv_setup();
