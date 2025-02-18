@@ -5,6 +5,6 @@
 
 void ctrl_steering_setup();
 void ctrl_steering_loop();
-void ctrl_steering_set_Angle(const bool angle,const uint8_t power);
+void ctrl_steering_set_Angle(bool direction,const uint8_t power);
 
 #endif

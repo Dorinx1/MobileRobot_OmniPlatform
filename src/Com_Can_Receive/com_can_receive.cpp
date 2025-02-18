@@ -10,11 +10,11 @@ uint8_t Speed;
 bool Dir;
 
 /*Servo driver var */
-bool Angle;
-uint8_t Power;
+bool Dir_servo;
+uint8_t Power_Servo;
 
 #define message_l298_id 0x00
-#define message_servo_id 0x10
+#define message_servo_id 0x00
 
 MCP_CAN CAN0_RECV(10);  // Set CS to pin 10
 
@@ -41,10 +41,11 @@ void com_can_recv_loop()
   {
   CAN0_RECV.readMsgBuf(&rxId, &len, rxBuf);  // Read data: len = data length, buf = data byte(s)
 
+    /*--------------------Traction part-----------------------*/  
     #if CURRENT_L298_ID == 0x00
       if (message_l298_id == rxId)
       {
-        Serial.print("\n PCB with ID : ");
+        Serial.print("\n MESSAGE_ID : ");
         Serial.print(message_l298_id, HEX);
         Serial.print("\t");
         Serial.print(message_servo_id,HEX);
@@ -56,7 +57,7 @@ void com_can_recv_loop()
     #elif CURRENT_L298_ID  == 0x10
     if(message_l298_id == rxId )
     {
-      Serial.print("\n PCB with ID : ");
+      Serial.print("\n MESSAGE_ID : ");
       Serial.print(message_l298_id, HEX);
       Serial.print("\t");
       Serial.print(message_servo_id,HEX);
@@ -68,7 +69,7 @@ void com_can_recv_loop()
     #elif CURRENT_L298_ID == 0x20
     if(message_l298_id == rxId)
     {
-      Serial.print("\n PCB with ID : ");
+      Serial.print("\n MESSAGE_ID : ");
       Serial.print(message_l298_id, HEX);
       Serial.print("\t");
       Serial.print(message_servo_id,HEX);
@@ -76,17 +77,73 @@ void com_can_recv_loop()
       Dir = rxBuf[5];
       ctrl_traction_move(Speed, Dir);
     }
+    else
+    {
+      Serial.println("l298_id 0x20 fail command");
+    } 
 
     #elif CURRENT_L298_ID == 0x30
     if(message_l298_id == rxId)
     {
-      Serial.print("\n PCB with ID : ");
+      Serial.print("\n MESSAGE_ID : ");
       Serial.print(message_l298_id, HEX);
       Serial.print("\t");
       Serial.print(message_servo_id,HEX);
       Speed = rxBuf[6]; 
       Dir = rxBuf[7];
       ctrl_traction_move(Speed, Dir);
+    }
+    #endif
+    
+    
+    /*---------------Steering Part -----------------------------*/
+    #if CURRENT_SERVO_ID == 0x01
+    if(message_servo_id == rxId)
+    {
+      Serial.print("\n MESSAGE_ID : ");
+      Serial.print(message_servo_id, HEX);
+      Serial.print("\t");
+      Serial.print(message_servo_id,HEX);
+      Dir_servo = rxBuf[0];
+      Power_Servo = rxBuf[1];
+      ctrl_steering_set_Angle(Dir_servo,Power_Servo);
+    }
+    #elif CURRENT_SERVO_ID == 0x11
+    if(message_servo_id == rxId)
+    {
+      Serial.print("\n MESSAGE_ID : ");
+      Serial.print(message_servo_id, HEX);
+      Serial.print("\t");
+      Serial.print(message_servo_id,HEX);
+      Dir_servo = rxBuf[2];
+      Power_Servo = rxBuf[3];
+      ctrl_steering_set_Angle(Dir_servo,Power_Servo);
+    }
+    #elif CURRENT_SERVO_ID == 0x21
+    if(message_servo_id == rxId)
+    {
+      Serial.print("\n MESSAGE_ID : ");
+      Serial.print(message_servo_id, HEX);
+      Serial.print("\t");
+      Serial.print(message_servo_id,HEX);
+      Dir_servo = rxBuf[4];
+      Power_Servo = rxBuf[5];
+      ctrl_steering_set_Angle(Dir_servo,Power_Servo);
+    }
+    else 
+    {
+      Serial.println("Servo 0x21 fail comand");
+    }
+    #elif CURRENT_SERVO_ID == 0x31
+    if(message_servo_id == rxId)
+    {
+      Serial.print("\n MESSAGE_ID : ");
+      Serial.print(message_servo_id, HEX);
+      Serial.print("\t");
+      Serial.print(message_servo_id,HEX);
+      Dir_servo = rxBuf[6];
+      Power_Servo = rxBuf[7];
+      ctrl_steering_set_Angle(Dir_servo,Power_Servo);
     }
     #endif
     

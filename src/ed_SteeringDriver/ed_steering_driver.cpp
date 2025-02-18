@@ -1,20 +1,22 @@
 #include "Arduino.h"
 #include "ed_SteeringDriver/ed_steering_driver.h"
 
-Servo myServo;
-uint8_t Current_Angle = 90;
-uint8_t Max_angle = 180;
-uint8_t Setup_Angle = 90;
-uint8_t Min_angle = 0;
+uint8_t Current_Steering_Angle;
 
+Servo myServo;
+
+typedef struct Angle_DG{           
+    uint8_t Angle_0;
+    uint8_t Angle_90;
+    uint8_t Angle_180;
+}Angle;
+    
+Angle P1 = {45,90,135}; 
 
 void ed_steering_driver_setup()
 {
     pinMode(STEERING_ENB,OUTPUT);
-
     myServo.attach(ST_CONT_PIN);
-
-    if(Current_Angle == Setup_Angle) set_curent_angle();
 }
 
 void ed_steering_driver_loop()
@@ -22,37 +24,50 @@ void ed_steering_driver_loop()
 
 }
 
-void set_curent_angle()
+uint8_t set_curent_angle()
 {
-    myServo.write(Setup_Angle);
+    analogWrite(STEERING_ENB,130);
+    myServo.write(P1.Angle_90);
+    Current_Steering_Angle = P1.Angle_90;
+    delay(100);
+    return Current_Steering_Angle;
 }
 
-void set_up_servo_target_angele()
+uint8_t set_left_servo_target_angele(uint8_t servo_power,uint8_t delta)
 {
-    if(Current_Angle < Max_angle)
+    if(Current_Steering_Angle >= 45 && Current_Steering_Angle <= 135)
     {
-    uint8_t set_target_angle = 1;
-    Current_Angle += set_target_angle;
-    uint8_t get_target_angle = get_servo_target_angele(Current_Angle);
-    Current_Angle = get_target_angle;
-    myServo.write(Current_Angle);
+        int Set_Target_Angle = Current_Steering_Angle - delta;
+        analogWrite(STEERING_ENB, servo_power);
+        myServo.write(Set_Target_Angle);
+        Current_Steering_Angle = Set_Target_Angle;
+        delay(100);
     }
-}    
- 
-void set_down_servo_target_angele() 
-{
-    if(Current_Angle > Min_angle)
+    else
     {
-    uint8_t set_target_angle = 1;
-    Current_Angle -= set_target_angle;
-    uint8_t get_target_angle = get_servo_target_angele(Current_Angle);
-    Current_Angle = get_target_angle;
-    myServo.write(Current_Angle);
+        Serial.println(" ed_steering_driver -> L.fault ");
     }
-}    
+    return Current_Steering_Angle;
+}
 
-uint8_t get_servo_target_angele(uint8_t GetAngle) {
-    if (GetAngle > Max_angle) return Max_angle;
-    if (GetAngle < Min_angle) return Min_angle;
-    return GetAngle;
+uint8_t  set_right_servo_target_angele(uint8_t servo_power,uint8_t delta)
+{
+    if(Current_Steering_Angle >= 45 && Current_Steering_Angle <= 135)
+    {
+        int Set_Target_Angle = Current_Steering_Angle + delta;
+        analogWrite(STEERING_ENB, servo_power);
+        myServo.write(Set_Target_Angle);
+        Current_Steering_Angle = Set_Target_Angle;
+        delay(100);
+    }
+    else
+    {
+        Serial.println(" ed_steering_driver -> R.fault ");
+    }
+    return Current_Steering_Angle;
+}
+
+void stop_servo()
+{
+    digitalWrite(STEERING_ENB,LOW);
 }
